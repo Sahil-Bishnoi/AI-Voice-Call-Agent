@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Voice Agent</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+        }
+
+        input {
+            width: 90%;
+            padding: 14px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 30px;
+            background: #111;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        button:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>AI Voice Agent</h1>
+
+    <p>Enter your phone number and talk to your AI assistant.</p>
+
+    <input
+        type="tel"
+        id="phone"
+        placeholder="+91XXXXXXXXXX"
+    >
+
+    <button id="callButton" onclick="makeCall()">
+        📞 Call Me
+    </button>
+
+    <div id="status">
+        Status: Ready
+    </div>
+
+</div>
+
+
+<script>
+
+async function makeCall() {
+
+    const phone = document.getElementById("phone").value.trim();
+    const status = document.getElementById("status");
+    const button = document.getElementById("callButton");
+
+    if (!phone) {
+        status.innerText = "❌ Please enter your phone number.";
+        return;
+    }
+
+    status.innerText = "📞 Calling...";
+    button.disabled = true;
+
+    try {
+
+        const response = await fetch("/make-call", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                phone_number: phone
+            })
+        });
+
+        const data = await response.json();
+
+        console.log("Backend response:", data);
+
+        if (response.ok && data.success !== false) {
+
+            status.innerText = "✅ Call initiated!";
+
+        } else {
+
+            status.innerText =
+                "❌ " + (data.message || "Call failed.");
+
+        }
+
+    } catch (error) {
+
+        console.error("Error:", error);
+
+        status.innerText =
+            "❌ Could not connect to server.";
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+}
+
+</script>
+
+</body>
+</html>
